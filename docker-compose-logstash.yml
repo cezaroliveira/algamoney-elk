@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    container_name: logstash-container
+    volumes:
+      ### Config
+      # - type: bind
+      #   source: ./logstash/config/logstash.yml
+      #   target: /usr/share/logstash/config/logstash.yml
+      #   read_only: true
+      ### Pipelines
+      # - type: bind
+      #   source: ./logstash/pipeline/logstash.conf
+      #   # source: ./weblogic-logstash-pipeline.conf
+      #   target: /usr/share/logstash/pipeline/logstash.conf
+      #   read_only: true
+      # - type: bind
+      #   source: ./logstash/pipeline/logstash.conf
+      #   target: /usr/share/logstash/pipeline/logstash.conf
+      #   read_only: true
+      - type: bind
+        source: ./logstash/pipeline/logstash-file-sample.conf
+        target: /usr/share/logstash/pipeline/logstash-file-sample.conf
+        read_only: true
+      # - type: bind
+      #   source: ./logstash/pipeline-robust
+      #   target: /usr/share/logstash/pipeline
+      #   read_only: true
+      ### Logs
+      - type: bind
+        source: ./fakelogs
+        target: /fakelogs
+        read_only: true
+      ### Data
+      - type: bind
+        source: ./logstash/data
+        target: /var/lib/logstash/data
+      ### Templates
+      - type: bind
+        source: ./logstash/template
+        target: /var/lib/logstash/template
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "8003:8003"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xms256m -Xmx256m"
+    # Automatically reload pipeline files when changed
+    command: --config.reload.automatic
+    networks:
+      - default
+
+volumes:
+  esdata1:
+    driver: local
+
+networks:
+  # Using an external user-defined network, already created before
+  # "default" => visible internally only, used by internals containers that don't see the external network
+  # "algamoney-network" => visible by others containers created externally to this
+  default:
+    external:
+      name: algamoney-network
+  # Using a default network dynamically created by docker, used by internals containers only
+  # Pattern => dirName_algamoney-network
+  # algamoney-network:
+  #   driver: bridge
