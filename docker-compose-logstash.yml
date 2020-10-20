@@ -21,14 +21,14 @@ services:
       #   source: ./logstash/pipeline/logstash.conf
       #   target: /usr/share/logstash/pipeline/logstash.conf
       #   read_only: true
-      - type: bind
-        source: ./logstash/pipeline/logstash-file-sample.conf
-        target: /usr/share/logstash/pipeline/logstash-file-sample.conf
-        read_only: true
       # - type: bind
-      #   source: ./logstash/pipeline-robust
-      #   target: /usr/share/logstash/pipeline
+      #   source: ./logstash/pipeline/logstash-file-sample.conf
+      #   target: /usr/share/logstash/pipeline/logstash-file-sample.conf
       #   read_only: true
+      - type: bind
+        source: ./logstash/pipeline-robust
+        target: /usr/share/logstash/pipeline
+        read_only: true
       ### Logs
       - type: bind
         source: ./fakelogs
