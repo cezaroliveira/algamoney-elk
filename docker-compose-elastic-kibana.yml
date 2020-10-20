@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    container_name: elasticsearch-container
+    environment:
+      - node.name=elasticsearch
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=elasticsearch
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - default
+    healthcheck:
+      # test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:${ES_PASSWORD}", "http://localhost:9200/_cat/health"]
+      test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:", "http://localhost:9200/_cat/health"]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    container_name: kibana-container
+    environment:
+      LS_JAVA_OPTS: "-Xms256m -Xmx256m"
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    ports:
+      - 5601:5601
+    networks:
+      - default
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:5601/login"]
+      retries: 6
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  # Using an external user-defined network, already created before
+  # "default" => visible internally only, used by internals containers that don't see the external network
+  # "algamoney-network" => visible by others containers created externally to this
+  default:
+    external:
+      name: algamoney-network
+  # Using a default network dynamically created by docker, used by internals containers only
+  # Pattern => dirName_algamoney-network
+  # algamoney-network:
+  #   driver: bridge
