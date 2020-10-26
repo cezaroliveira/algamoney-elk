@@ -25,23 +25,36 @@ services:
       #   source: ./logstash/pipeline/logstash-file-sample.conf
       #   target: /usr/share/logstash/pipeline/logstash-file-sample.conf
       #   read_only: true
+      # Filebeat
+      # - type: bind
+      #   source: ./logstash/pipeline/logstash-filebeat-sample.conf
+      #   target: /usr/share/logstash/pipeline/logstash-filebeat-sample.conf
+      #   read_only: true
       - type: bind
-        source: ./logstash/pipeline-robust
-        target: /usr/share/logstash/pipeline
+        source: ./logstash/pipeline/logstash-weblogic.conf
+        target: /usr/share/logstash/pipeline/logstash-weblogic.conf
         read_only: true
+      - type: bind
+        source: ./logstash/pipeline/patterns
+        target: /usr/share/logstash/pipeline/patterns
+        read_only: true
+      # - type: bind
+      #   source: ./logstash/pipeline-robust
+      #   target: /usr/share/logstash/pipeline
+      #   read_only: true
       ### Logs
       - type: bind
         source: ./fakelogs
         target: /fakelogs
         read_only: true
-      ### Data
-      - type: bind
-        source: ./logstash/data
-        target: /var/lib/logstash/data
+      # ### Data
+      # - type: bind
+      #   source: ./logstash/data
+      #   target: /var/lib/logstash/data
       ### Templates
-      - type: bind
-        source: ./logstash/template
-        target: /var/lib/logstash/template
+      # - type: bind
+      #   source: ./logstash/template
+      #   target: /var/lib/logstash/template
     ports:
       - "5000:5000/tcp"
       - "5000:5000/udp"
@@ -54,8 +67,45 @@ services:
     networks:
       - default
 
+  filebeat:
+    container_name: filebeat-container
+    # hostname: filebeat
+    user: root
+    image: "docker.elastic.co/beats/filebeat:${ELK_VERSION}"
+    volumes:
+      #Mount the filebeast configuration so users can make edit
+      # - .\filebeat\config\filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - .\filebeat\config\weblogic-filebeat.yml:/usr/share/filebeat/filebeat.yml
+      # #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded
+      # - .\filebeat\config\prospectors.d\:/usr/share/filebeat/prospectors.d/
+      # #Mount the nginx logs into the filebeat container so we can access and index them using the filebeat nginx module
+      # - .\logs\nginx\:/var/log/nginx/
+      # #Mount the apache2 logs into the filebeat container so we can access and index them using the filebeat apache2 module
+      # - .\logs\apache2\:/var/log/apache2/
+      #Mount the mysql logs into the filebeat container so we can access and and index them using the filebeat mysql module
+      - ..\algamoney-api\src\main\resources\db\logs\:/var/log/mysql/
+      # #Mount the docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d
+      # - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
+      #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication
+      # - fbdata:/usr/share/filebeat/data/
+      - type: bind
+        source: .\fakelogs
+        target: /fakelogs
+        read_only: true
+    networks: 
+      - default
+    # command: filebeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD} -strict.perms=false
+    # command: filebeat -e -E output.elasticsearch.username=elastic -strict.perms=false
+    # restart: on-failure
+    depends_on:
+      - logstash
+    #   #wait for the these services to come up. This ensures the logs are available and ES exists for indexing
+    #   elasticsearch:  { condition: service_healthy }
+    #   nginx: { condition: service_started }
+    #   apache2: { condition: service_started }
+
 volumes:
-  esdata1:
+  fbdata:
     driver: local
 
 networks:

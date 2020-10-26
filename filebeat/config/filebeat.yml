@@ -1,0 +1,13 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /fakelogs/access.log
+
+# All data send to Elasticsearch to index
+# output.elasticsearch:
+#   hosts: ["elasticsearch:9200"]
+
+# All data send to Logstash sanitize and send to Elasticsearch
+output.logstash:
+  hosts: ["logstash:5043"]
