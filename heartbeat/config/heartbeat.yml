@@ -1,0 +1,110 @@
+heartbeat.monitors:
+#Monitor all containers using an icmp ping
+- type: icmp
+  id: icmp-monitor
+  name: icmp-monitor
+  schedule: '*/5 * * * * * *'
+  # hosts: ["filebeat","metricbeat","packetbeat","elasticsearch","kibana","apache2","nginx","mysql"]
+  hosts: 
+    - filebeat
+    - heartbeat
+    - elasticsearch
+    - logstash
+    - kibana
+    - mysql
+    - algamoney-api
+    - algamoney-ui
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 16s
+  wait: 1s
+#Monitor the Algamoney-Api instance over http with a GET to the /  - checking for a 200 response
+- type: http
+  id: http-monitor-algamoney-api
+  name: http-monitor-algamoney-api
+  enabled: true
+  schedule: '@every 5s'
+  urls: ["http://algamoney-api:8080/swagger-ui.html"]
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 5s
+  check.request:
+    method: "GET"
+  check.response:
+    status: 200
+#Monitor the Algamoney-Ui instance over http with a GET to the /  - checking for a 200 response
+- type: http
+  id: http-monitor-algamoney-ui
+  name: http-monitor-algamoney-ui
+  enabled: true
+  schedule: '@every 5s'
+  urls: ["http://algamoney-ui:4200"]
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 5s
+  check.request:
+    method: "GET"
+  check.response:
+    status: 200
+#Monitor the ES instance over http with a GET to the /  - checking for a 200 response
+- type: http
+  id: http-monitor-elasticsearch
+  name: http-monitor-elasticsearch
+  enabled: true
+  schedule: '@every 5s'
+  urls: ["http://elasticsearch:9200"]
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 5s
+  # username: '${ES_USERNAME:elastic}'
+  # password: '${ES_PASSWORD:changeme}'
+  check.request:
+    method: "GET"
+  check.response:
+    status: 200
+#Monitor the Logstash instance with a http GET to / - checking for a 200 response code
+- type: http
+  id: http-monitor-logstash
+  name: http-monitor-logstash
+  enabled: true
+  schedule: '@every 5s'
+  urls: ["http://logstash:9600"]
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 5s
+  check.request:
+    method: "GET"
+  check.response:
+    status: 200
+#Monitor the Kibana instance with a http GET to / - checking for a 200 response code
+- type: http
+  id: http-monitor-kibana
+  name: http-monitor-kibana
+  enabled: true
+  schedule: '@every 5s'
+  # urls: ["http://kibana:5601"]
+  urls: ["http://kibana:5601/app/home"]
+  ipv4: true
+  ipv6: true
+  mode: any
+  timeout: 5s
+  check.request:
+    method: "GET"
+  check.response:
+    status: 200
+#Monitor the Mysql instance by attempting a tcp connect on port 3306
+- type: tcp
+  id: tcp-monitor-mysql
+  name: tcp-monitor-mysql
+  enabled: true
+  schedule: '@every 5s'
+  hosts: ["tcp://mysql:3306"]
+#Index any heartbeat data to our ES instance
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+logging.to_files: false

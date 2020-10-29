@@ -104,6 +104,22 @@ services:
     #   nginx: { condition: service_started }
     #   apache2: { condition: service_started }
 
+  heartbeat:
+    container_name: heartbeat-container
+    # hostname: heartbeat
+    image: "docker.elastic.co/beats/heartbeat:${ELK_VERSION}"
+    volumes:
+      #Mount the heartbeat configuration so users can make edits
+      - .\heartbeat\config\heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+    # depends_on:
+    #   elasticsearch:  { condition: service_healthy }
+    # environment:
+    #   - "ES_PASSWORD=${ES_PASSWORD}"
+    # command: heartbeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD} -strict.perms=false
+    networks:
+      - default
+    # restart: on-failure
+
 volumes:
   fbdata:
     driver: local
