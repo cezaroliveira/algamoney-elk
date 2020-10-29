@@ -13,7 +13,7 @@ heartbeat.monitors:
     - kibana
     - mysql
     - algamoney-api
-    - algamoney-ui
+    # - algamoney-ui
   ipv4: true
   ipv6: true
   mode: any
@@ -34,21 +34,21 @@ heartbeat.monitors:
     method: "GET"
   check.response:
     status: 200
-#Monitor the Algamoney-Ui instance over http with a GET to the /  - checking for a 200 response
-- type: http
-  id: http-monitor-algamoney-ui
-  name: http-monitor-algamoney-ui
-  enabled: true
-  schedule: '@every 5s'
-  urls: ["http://algamoney-ui:4200"]
-  ipv4: true
-  ipv6: true
-  mode: any
-  timeout: 5s
-  check.request:
-    method: "GET"
-  check.response:
-    status: 200
+# #Monitor the Algamoney-Ui instance over http with a GET to the /  - checking for a 200 response
+# - type: http
+#   id: http-monitor-algamoney-ui
+#   name: http-monitor-algamoney-ui
+#   enabled: true
+#   schedule: '@every 5s'
+#   urls: ["http://algamoney-ui:4200"]
+#   ipv4: true
+#   ipv6: true
+#   mode: any
+#   timeout: 5s
+#   check.request:
+#     method: "GET"
+#   check.response:
+#     status: 200
 #Monitor the ES instance over http with a GET to the /  - checking for a 200 response
 - type: http
   id: http-monitor-elasticsearch
