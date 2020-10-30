@@ -31,8 +31,8 @@ services:
       #   target: /usr/share/logstash/pipeline/logstash-filebeat-sample.conf
       #   read_only: true
       - type: bind
-        source: ./logstash/pipeline/logstash-weblogic.conf
-        target: /usr/share/logstash/pipeline/logstash-weblogic.conf
+        source: ./logstash/pipeline/logstash-mysql.conf
+        target: /usr/share/logstash/pipeline/logstash-mysql.conf
         read_only: true
       - type: bind
         source: ./logstash/pipeline/patterns
@@ -74,8 +74,7 @@ services:
     image: "docker.elastic.co/beats/filebeat:${ELK_VERSION}"
     volumes:
       #Mount the filebeast configuration so users can make edit
-      # - .\filebeat\config\filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - .\filebeat\config\weblogic-filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - .\filebeat\config\filebeat.yml:/usr/share/filebeat/filebeat.yml
       # #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded
       # - .\filebeat\config\prospectors.d\:/usr/share/filebeat/prospectors.d/
       # #Mount the nginx logs into the filebeat container so we can access and index them using the filebeat nginx module
@@ -120,9 +119,9 @@ services:
       - default
     # restart: on-failure
 
-volumes:
-  fbdata:
-    driver: local
+# volumes:
+#   fbdata:
+#     driver: local
 
 networks:
   # Using an external user-defined network, already created before

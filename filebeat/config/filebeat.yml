@@ -1,12 +1,16 @@
 filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /fakelogs/access.log
 
-# All data send to Elasticsearch to index
-# output.elasticsearch:
-#   hosts: ["elasticsearch:9200"]
+- type: log
+  include_lines: ['^[0-9]{4}\-[0-9]{2}\-[0-9]{2}']
+  exclude_lines: ['Field List']
+  tags: ["mysql-log", "mysql-general-log"]
+  paths:
+    - /var/log/mysql/general*.log
+
+- type: log
+  tags: ["mysql-log", "mysql-slow-log"]
+  paths:
+    - /var/log/mysql/slow*.log
 
 # All data send to Logstash sanitize and send to Elasticsearch
 output.logstash:
