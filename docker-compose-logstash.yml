@@ -74,21 +74,21 @@ services:
     image: "docker.elastic.co/beats/filebeat:${ELK_VERSION}"
     volumes:
       #Mount the filebeast configuration so users can make edit
-      - .\filebeat\config\filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
       # #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded
-      # - .\filebeat\config\prospectors.d\:/usr/share/filebeat/prospectors.d/
+      # - ./filebeat/config/prospectors.d/:/usr/share/filebeat/prospectors.d/
       # #Mount the nginx logs into the filebeat container so we can access and index them using the filebeat nginx module
-      # - .\logs\nginx\:/var/log/nginx/
+      # - ./logs/nginx/:/var/log/nginx/
       # #Mount the apache2 logs into the filebeat container so we can access and index them using the filebeat apache2 module
-      # - .\logs\apache2\:/var/log/apache2/
+      # - ./logs/apache2/:/var/log/apache2/
       #Mount the mysql logs into the filebeat container so we can access and and index them using the filebeat mysql module
-      - ..\algamoney-api\src\main\resources\db\logs\:/var/log/mysql/
+      - ../algamoney-api/src/main/resources/db/logs/:/var/log/mysql/
       # #Mount the docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d
       # - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
       #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication
       # - fbdata:/usr/share/filebeat/data/
       - type: bind
-        source: .\fakelogs
+        source: ./fakelogs
         target: /fakelogs
         read_only: true
     networks: 
@@ -109,7 +109,7 @@ services:
     image: "docker.elastic.co/beats/heartbeat:${ELK_VERSION}"
     volumes:
       #Mount the heartbeat configuration so users can make edits
-      - .\heartbeat\config\heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
+      - ./heartbeat/config/heartbeat.yml:/usr/share/heartbeat/heartbeat.yml
     # depends_on:
     #   elasticsearch:  { condition: service_healthy }
     # environment:
