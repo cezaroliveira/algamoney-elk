@@ -1,1 +1,27 @@
 # algamoney-elk
+
+# Problem using WSL 2
+
+When starting Elasticsearch on Docker, is showing the problem below:
+
+> [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+
+> ERROR: Elasticsearch did not exit normally - check the logs at /usr/share/elasticsearch/logs/docker-cluster.log
+
+It occours because of the variable below:
+
+```bash
+cat /proc/sys/vm/max_map_count
+```
+
+To solve this, inside of WSL 2 image (Ubuntu, Alpine, Centios, etc), execute the code below:
+
+```bash
+sudo sysctl -w vm.max_map_count=262144
+```
+
+Check if change occourred:
+
+```bash
+cat /proc/sys/vm/max_map_count
+```
